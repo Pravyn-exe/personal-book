@@ -47,7 +47,6 @@
         .active-tab { 
             background: rgba(255, 255, 255, 0.9); 
             color: #000; 
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
 
         .specular-card {
@@ -64,7 +63,6 @@
             letter-spacing: 0.5px;
             transition: all 0.2s ease;
         }
-
         .btn-main:active { transform: scale(0.96); }
     </style>
 </head>
@@ -127,7 +125,7 @@
     </div>
 
     <script>
-        const KEY = 'pb_liquid_v16';
+        const KEY = 'pb_liquid_v17_split'; // New key for split logic
         let state = JSON.parse(localStorage.getItem(KEY)) || { balance: 0, expenses: [], loans: [] };
 
         function showBook(tab) {
@@ -138,13 +136,15 @@
         }
 
         function updateUI() {
+            // Daily Spend UI - Only shows daily expenses
             const pl = document.getElementById('p-list'); pl.innerHTML = '';
             let spent = state.expenses.reduce((a, c) => a + parseFloat(c.amt), 0);
             state.expenses.forEach(i => {
-                pl.innerHTML += `<div class="flex justify-between p-4 bg-white/5 border border-white/5 rounded-2xl shadow-inner"><div class="text-sm font-bold">${i.name}<br><span class="text-[9px] text-slate-500 italic">${i.date}</span></div><div class="text-red-400 font-black">₹${parseFloat(i.amt).toLocaleString('en-IN')}</div></div>`;
+                pl.innerHTML += `<div class="flex justify-between p-4 bg-white/5 border border-white/5 rounded-2xl"><div class="text-sm font-bold">${i.name}<br><span class="text-[9px] text-slate-500 italic">${i.date}</span></div><div class="text-red-400 font-black">₹${parseFloat(i.amt).toLocaleString('en-IN')}</div></div>`;
             });
             document.getElementById('p-rem').innerText = (state.balance - spent).toLocaleString('en-IN');
 
+            // Borrowers UI - Completely separate
             const bl = document.getElementById('b-list'); bl.innerHTML = '';
             let b_tot = state.loans.reduce((a, c) => a + parseFloat(c.amt), 0);
             state.loans.forEach((i, idx) => {
@@ -165,17 +165,16 @@
             e.target.reset(); updateUI();
         };
 
+        // NEW LENDING LOGIC: No more state.expenses.unshift here
         document.getElementById('b-form').onsubmit = (e) => {
             e.preventDefault();
             const n = document.getElementById('b-name').value, a = document.getElementById('b-amt').value;
-            state.expenses.unshift({ name: `Lent: ${n}`, amt: a, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) });
             state.loans.unshift({ name: n, amt: a, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) });
             e.target.reset(); updateUI();
         };
 
+        // NEW SETTLE LOGIC: Only removes borrower, does not add to balance
         function payLoan(idx) {
-            const l = state.loans[idx];
-            state.expenses.unshift({ name: `Paid: ${l.name}`, amt: -l.amt, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) });
             state.loans.splice(idx, 1); updateUI();
         }
 
