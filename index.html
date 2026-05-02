@@ -2,60 +2,102 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Personal Book</title>
-    <!-- This makes it feel like a real app when added to homescreen -->
+    
+    <!-- APP SHORTCUT MODIFICATIONS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Personal Book">
+    
+    <!-- Native App Icon (Black circle with 💰 emoji) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23111827%22/><text y=%22.9em%22 x=%22.28em%22 font-size=%2255%22>💰</text></svg>">
+    
+    <!-- Splash Screen Logic (Prevents white flash on load) -->
+    <script>
+        // Add a temporary splash screen
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.navigator.standalone) {
+                const splash = document.createElement('div');
+                splash.id = 'app-splash';
+                splash.style = 'position:fixed;top:0;left:0;width:100%;height:100%;background:%230f172a;display:flex;justify-content:center;items-center;z-index:9999;transition:opacity 0.5s;';
+                splash.innerHTML = '<div style="background:%23111827;width:120px;height:120px;border-radius:100px;display:flex;justify-content:center;align-items:center;font-size:60px;box-shadow:0 10px 30px rgba(0,0,0,0.3)">💰</div>';
+                document.body.appendChild(splash);
+                
+                setTimeout(() => {
+                    splash.style.opacity = '0';
+                    setTimeout(() => splash.remove(), 500);
+                }, 1000);
+            }
+        });
+    </script>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .glass-card { background: white; border-radius: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+        .glass-card { background: white; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 1px solid rgba(255,255,255,0.8); }
+        #app-splash div { animation: splashPulse 1.5s infinite; }
+        @keyframes splashPulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
     </style>
 </head>
-<body class="p-4">
+<body class="p-4 md:p-8">
     <div class="max-w-md mx-auto">
-        <div class="glass-card p-6 mt-4">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-xl font-black text-slate-800 tracking-tight">PERSONAL BOOK</h1>
-                <div id="date-label" class="bg-slate-900 text-white px-3 py-1 rounded-lg text-[10px] font-bold">MAY 2026</div>
+        <div class="glass-card p-6 md:p-8 mt-4 md:mt-10 relative overflow-hidden">
+            <!-- Header with stylized logo -->
+            <div class="flex justify-between items-center mb-8 relative z-10">
+                <div class="flex items-center gap-3">
+                    <div class="bg-slate-900 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl shadow-lg">💰</div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tighter">Personal Book</h1>
+                </div>
+                <div id="date-label" class="bg-slate-100 text-slate-600 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide">MAY 2026</div>
             </div>
 
-            <!-- Balance Card -->
-            <div class="bg-slate-900 rounded-3xl p-6 text-white mb-6 shadow-xl">
-                <p class="text-[10px] opacity-60 uppercase tracking-widest font-bold">Available to Spend</p>
-                <div class="text-4xl font-bold mt-1">₹<span id="display-remaining">0</span></div>
-                <div class="mt-4 grid grid-cols-2 gap-4 text-[11px] border-t border-slate-700 pt-4">
-                    <div><span class="opacity-50">BUDGET:</span> ₹<span id="display-budget">0</span></div>
-                    <div class="text-right"><span class="opacity-50">SPENT:</span> ₹<span id="display-spent">0</span></div>
+            <!-- Enhanced Balance Card -->
+            <div class="bg-slate-950 rounded-3xl p-8 text-white mb-8 shadow-2xl shadow-slate-300 relative overflow-hidden">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-slate-800 rounded-full opacity-50"></div>
+                <p class="text-xs opacity-60 uppercase tracking-widest font-bold relative z-10">Remaining Balance</p>
+                <div class="text-5xl font-extrabold mt-2 relative z-10 tracking-tight">₹<span id="display-remaining">0</span></div>
+                <div class="mt-6 grid grid-cols-2 gap-6 text-sm border-t border-slate-800 pt-6 relative z-10">
+                    <div><span class="opacity-50">Budget:</span> <span class="font-semibold">₹<span id="display-budget">0</span></span></div>
+                    <div class="text-right"><span class="opacity-50">Spent:</span> <span class="font-semibold text-red-300">₹<span id="display-spent">0</span></span></div>
                 </div>
             </div>
 
-            <!-- Quick Add -->
-            <div class="space-y-3">
-                <input type="number" id="budget-input" placeholder="Update Monthly Budget" class="w-full p-3 rounded-xl bg-gray-50 border border-gray-100 text-sm outline-none focus:border-slate-400">
-                <button onclick="updateBudget()" class="w-full bg-slate-200 text-slate-800 py-2 rounded-xl text-xs font-bold uppercase tracking-wider mb-4">Set Budget</button>
+            <!-- Input Section -->
+            <div class="space-y-4 mb-8">
+                <div class="flex gap-2">
+                    <input type="number" id="budget-input" placeholder="Set New Monthly Budget" class="flex-1 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-sm outline-none focus:border-slate-300 focus:bg-white transition">
+                    <button onclick="updateBudget()" class="bg-slate-200 text-slate-800 px-6 rounded-2xl text-xs font-bold uppercase tracking-wider hover:bg-slate-300 transition">Set</button>
+                </div>
                 
-                <form id="expense-form" class="space-y-3">
-                    <input type="text" id="item-name" placeholder="Where did it go? (e.g. Coffee)" class="w-full p-3 rounded-xl border border-gray-200 text-sm outline-none shadow-sm" required>
+                <form id="expense-form" class="space-y-3 bg-white p-2 rounded-3xl border border-slate-100 shadow-inner">
+                    <input type="text" id="item-name" placeholder="Expense description..." class="w-full p-4 rounded-2xl border-none bg-transparent text-base outline-none" required>
                     <div class="flex gap-2">
-                        <input type="number" id="item-amount" placeholder="Amount" class="w-full p-3 rounded-xl border border-gray-200 text-sm outline-none shadow-sm" required>
-                        <button type="submit" class="bg-slate-900 text-white px-8 rounded-xl font-bold text-sm shadow-lg">ADD</button>
+                        <input type="number" id="item-amount" placeholder="Amount (₹)" class="w-full p-4 rounded-2xl border-none bg-slate-50 text-base outline-none font-medium" required>
+                        <button type="submit" class="bg-slate-950 text-white px-10 rounded-2xl font-bold text-sm shadow-lg hover:bg-black transition">ADD</button>
                     </div>
                 </form>
             </div>
 
-            <!-- List -->
-            <div id="expense-list" class="mt-8 space-y-3 max-h-60 overflow-y-auto"></div>
+            <!-- Expense List -->
+            <div>
+                <h3 class="text-sm font-bold text-slate-400 uppercase mb-4 tracking-widest px-2">Recent Activity</h3>
+                <div id="expense-list" class="space-y-3 max-h-72 overflow-y-auto pr-2 overscroll-contain">
+                    <!-- Expenses disappear when reset -->
+                </div>
+            </div>
 
-            <button onclick="clearData()" class="mt-8 w-full text-[9px] text-gray-300 tracking-[.2em] uppercase">Reset All Data</button>
+            <button onclick="clearData()" class="mt-12 w-full text-[10px] text-slate-300 tracking-[.3em] uppercase hover:text-red-400 transition-colors">Wipe All Records</button>
         </div>
     </div>
 
     <script>
-        let budget = parseFloat(localStorage.getItem('pb_v4_budget')) || 0;
-        let expenses = JSON.parse(localStorage.getItem('pb_v4_expenses')) || [];
+        const key_budget = 'pb_v7_budget';
+        const key_expenses = 'pb_v7_expenses';
+        
+        let budget = parseFloat(localStorage.getItem(key_budget)) || 0;
+        let expenses = JSON.parse(localStorage.getItem(key_expenses)) || [];
 
         function updateUI() {
             const list = document.getElementById('expense-list');
@@ -65,13 +107,13 @@
             expenses.forEach((item) => {
                 totalSpent += parseFloat(item.amount);
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center bg-white p-4 rounded-2xl border border-gray-50 shadow-sm";
+                div.className = "flex justify-between items-center bg-white p-5 rounded-2xl border border-slate-50 shadow-sm";
                 div.innerHTML = `
                     <div>
-                        <p class="font-bold text-slate-800 text-sm">${item.name}</p>
-                        <p class="text-[10px] text-gray-400">${item.date}</p>
+                        <p class="font-semibold text-slate-900 text-base">${item.name}</p>
+                        <p class="text-xs text-slate-400">${item.date}</p>
                     </div>
-                    <div class="text-red-500 font-bold text-sm">-₹${parseFloat(item.amount).toLocaleString('en-IN')}</div>
+                    <div class="text-red-500 font-bold text-base">-₹${parseFloat(item.amount).toLocaleString('en-IN')}</div>
                 `;
                 list.appendChild(div);
             });
@@ -80,8 +122,8 @@
             document.getElementById('display-spent').innerText = totalSpent.toLocaleString('en-IN');
             document.getElementById('display-remaining').innerText = (budget - totalSpent).toLocaleString('en-IN');
             
-            localStorage.setItem('pb_v4_expenses', JSON.stringify(expenses));
-            localStorage.setItem('pb_v4_budget', budget);
+            localStorage.setItem(key_expenses, JSON.stringify(expenses));
+            localStorage.setItem(key_budget, budget);
         }
 
         function updateBudget() {
@@ -98,7 +140,7 @@
             updateUI();
         });
 
-        function clearData() { if(confirm("Clear everything?")) { expenses = []; budget = 0; updateUI(); } }
+        function clearData() { if(confirm("Are you sure? This will delete all history.")) { expenses = []; budget = 0; updateUI(); } }
         updateUI();
     </script>
 </body>
