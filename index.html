@@ -6,132 +6,184 @@
     <title>Personal Book</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%23111827%22/><text y=%22.9em%22 x=%22.28em%22 font-size=%2255%22>💰</text></svg>">
+    
+    <!-- App Icon -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2250%22 fill=%22%231e293b%22/><text y=%22.9em%22 x=%22.28em%22 font-size=%2255%22>💰</text></svg>">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
-        body { background-color: #f8fafc; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        .glass-card { background: white; border-radius: 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); }
-        .tab-active { border-bottom: 3px solid #0f172a; color: #0f172a; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body { 
+            background: linear-gradient(180deg, #0f172a 0%, #000000 100%); 
+            background-attachment: fixed;
+            font-family: 'Inter', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .glass-card { 
+            background: rgba(30, 41, 59, 0.5); 
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+        }
+
+        .input-style { 
+            background: rgba(255, 255, 255, 0.05); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            color: white; 
+            border-radius: 18px; 
+            outline: none; 
+            transition: all 0.3s ease;
+        }
+
+        .input-style:focus { 
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.3); 
+        }
+
+        .tab-btn { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 14px; 
+            font-size: 10px; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+        }
+
+        .active-tab { 
+            background: #ffffff; 
+            color: #0f172a; 
+            box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.2);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
-<body class="p-4">
-    <div class="max-w-md mx-auto mt-4">
-        <div class="glass-card p-6 min-h-[80vh] flex flex-col">
-            <!-- Header -->
-            <div class="flex items-center gap-3 mb-6">
-                <div class="bg-slate-900 text-white w-10 h-10 rounded-full flex items-center justify-center font-bold text-xl">💰</div>
-                <h1 class="text-2xl font-black text-slate-900 tracking-tighter">Personal Book</h1>
-            </div>
-
-            <!-- Navigation Tabs -->
-            <div class="flex border-b border-slate-100 mb-6 text-sm font-bold text-slate-400">
-                <button onclick="switchTab('spending')" id="tab-spending" class="flex-1 py-3 tab-active">DAILY SPEND</button>
-                <button onclick="switchTab('lending')" id="tab-lending" class="flex-1 py-3">LENDING</button>
-            </div>
-
-            <!-- DAILY SPENDING SECTION -->
-            <div id="section-spending" class="space-y-6">
-                <div class="bg-slate-950 rounded-3xl p-6 text-white shadow-xl">
-                    <p class="text-[10px] opacity-60 uppercase tracking-widest font-bold">Remaining Balance</p>
-                    <div class="text-4xl font-bold mt-1">₹<span id="display-remaining">0</span></div>
+<body class="p-4 md:p-10">
+    <div class="max-w-md mx-auto">
+        <div class="glass-card p-6 flex flex-col min-h-[90vh]">
+            
+            <!-- Logo Header -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-xl shadow-xl">💰</div>
+                    <h1 class="text-xl font-black uppercase tracking-tighter">Personal Book</h1>
                 </div>
-                
-                <form id="expense-form" class="space-y-3">
-                    <input type="text" id="item-name" placeholder="What did you buy?" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-sm outline-none" required>
-                    <div class="flex gap-2">
-                        <input type="number" id="item-amount" placeholder="Amount (₹)" class="w-full p-4 rounded-2xl bg-slate-50 border-none text-sm outline-none" required>
-                        <button type="submit" class="bg-slate-900 text-white px-8 rounded-2xl font-bold text-sm">ADD</button>
-                    </div>
-                </form>
-                <div id="expense-list" class="space-y-3 overflow-y-auto max-h-60"></div>
+                <div class="text-[10px] font-bold opacity-40 uppercase tracking-widest">May 2026</div>
             </div>
 
-            <!-- LENDING SECTION -->
-            <div id="section-lending" class="hidden space-y-6">
-                <div class="bg-indigo-900 rounded-3xl p-6 text-white shadow-xl">
-                    <p class="text-[10px] opacity-60 uppercase tracking-widest font-bold">Total Lent Out</p>
-                    <div class="text-4xl font-bold mt-1">₹<span id="display-lent">0</span></div>
+            <!-- Tab Switcher -->
+            <div class="flex bg-black/30 p-1.5 rounded-2xl mb-8 border border-white/5">
+                <button onclick="showBook('personal')" id="btn-personal" class="tab-btn flex-1 py-3 active-tab">DAILY SPEND</button>
+                <button onclick="showBook('borrower')" id="btn-borrower" class="tab-btn flex-1 py-3 text-slate-500">BORROWERS</button>
+            </div>
+
+            <!-- PERSONAL BOOK -->
+            <div id="book-personal" class="space-y-6">
+                <div class="balance-card rounded-3xl p-7 shadow-2xl relative overflow-hidden">
+                    <div class="absolute -right-10 -top-10 w-32 h-32 bg-white/5 rounded-full blur-3xl"></div>
+                    <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest">Available Cash</p>
+                    <div class="text-5xl font-black mt-1 tracking-tight">₹<span id="p-rem">0</span></div>
                 </div>
 
-                <form id="lending-form" class="space-y-3">
-                    <input type="text" id="borrower-name" placeholder="Who borrowed money?" class="w-full p-4 rounded-2xl bg-indigo-50 border-none text-sm outline-none" required>
+                <div class="space-y-4 bg-white/5 p-4 rounded-3xl border border-white/5">
                     <div class="flex gap-2">
-                        <input type="number" id="lent-amount" placeholder="Amount (₹)" class="w-full p-4 rounded-2xl bg-indigo-50 border-none text-sm outline-none" required>
-                        <button type="submit" class="bg-indigo-600 text-white px-8 rounded-2xl font-bold text-sm">LENT</button>
+                        <input type="number" id="p-set-budget" placeholder="Set Balance" class="input-style flex-1 p-3 text-sm">
+                        <button onclick="setNewBudget()" class="bg-white text-black px-5 rounded-xl text-[10px] font-black uppercase transition-transform active:scale-95">Update</button>
                     </div>
-                </form>
-                <div id="lending-list" class="space-y-3 overflow-y-auto max-h-60"></div>
+
+                    <form id="p-form" class="space-y-3 pt-4 border-t border-white/10">
+                        <input type="text" id="p-name" placeholder="Expense description..." class="input-style w-full p-4 text-sm" required>
+                        <div class="flex gap-2">
+                            <input type="number" id="p-amt" placeholder="Amount ₹" class="input-style w-full p-4 text-sm font-bold" required>
+                            <button type="submit" class="bg-white text-black px-8 rounded-2xl font-black text-xs uppercase transition-transform active:scale-95">Add</button>
+                        </div>
+                    </form>
+                </div>
+                <div id="p-list" class="space-y-3 overflow-y-auto max-h-52 pr-1"></div>
             </div>
 
-            <button onclick="clearData()" class="mt-auto pt-8 w-full text-[9px] text-slate-300 tracking-[.3em] uppercase">Reset All Data</button>
+            <!-- BORROWER BOOK -->
+            <div id="book-borrower" class="hidden space-y-6">
+                <div class="bg-indigo-600 rounded-3xl p-7 text-white shadow-2xl shadow-indigo-500/20">
+                    <p class="text-[10px] opacity-70 uppercase font-black tracking-widest">Money with Others</p>
+                    <div class="text-5xl font-black mt-1 tracking-tight">₹<span id="b-total">0</span></div>
+                </div>
+
+                <form id="b-form" class="space-y-3 bg-white/5 p-5 rounded-3xl border border-white/5">
+                    <input type="text" id="b-name" placeholder="Person's Name" class="input-style w-full p-4 text-sm" required>
+                    <div class="flex gap-2">
+                        <input type="number" id="b-amt" placeholder="Amount ₹" class="input-style w-full p-4 text-sm font-bold" required>
+                        <button type="submit" class="bg-indigo-500 text-white px-8 rounded-2xl font-black text-xs uppercase">Lend</button>
+                    </div>
+                </form>
+                <div id="b-list" class="space-y-3 overflow-y-auto max-h-64 pr-1"></div>
+            </div>
+
+            <button onclick="fullReset()" class="mt-auto pt-10 w-full text-[9px] text-slate-600 tracking-[.5em] uppercase font-bold hover:text-red-400 transition-colors">System Reset</button>
         </div>
     </div>
 
     <script>
-        let budget = parseFloat(localStorage.getItem('pb_v8_budget')) || 5000;
-        let expenses = JSON.parse(localStorage.getItem('pb_v8_expenses')) || [];
-        let lending = JSON.parse(localStorage.getItem('pb_v8_lending')) || [];
+        let p_bud = parseFloat(localStorage.getItem('p_bud_v14')) || 0;
+        let p_ex = JSON.parse(localStorage.getItem('p_ex_v14')) || [];
+        let b_loans = JSON.parse(localStorage.getItem('b_loans_v14')) || [];
 
-        function switchTab(tab) {
-            document.getElementById('section-spending').classList.toggle('hidden', tab !== 'spending');
-            document.getElementById('section-lending').classList.toggle('hidden', tab !== 'lending');
-            document.getElementById('tab-spending').className = tab === 'spending' ? 'flex-1 py-3 tab-active' : 'flex-1 py-3';
-            document.getElementById('tab-lending').className = tab === 'lending' ? 'flex-1 py-3 tab-active' : 'flex-1 py-3';
+        function showBook(type) {
+            document.getElementById('book-personal').classList.toggle('hidden', type !== 'personal');
+            document.getElementById('book-borrower').classList.toggle('hidden', type !== 'borrower');
+            document.getElementById('btn-personal').className = `tab-btn flex-1 py-3 ${type==='personal'?'active-tab':'text-slate-500'}`;
+            document.getElementById('btn-borrower').className = `tab-btn flex-1 py-3 ${type==='borrower'?'active-tab':'text-slate-500'}`;
         }
 
         function updateUI() {
-            // Spending Logic
-            const exList = document.getElementById('expense-list');
-            exList.innerHTML = '';
-            let spent = 0;
-            expenses.forEach(i => {
-                spent += parseFloat(i.amount);
-                exList.innerHTML += `<div class="flex justify-between p-4 bg-white rounded-2xl border border-slate-50 shadow-sm text-sm">
-                    <div><b>${i.name}</b><br><small class="text-slate-400">${i.date}</small></div>
-                    <div class="text-red-500 font-bold">-₹${i.amount}</div>
-                </div>`;
+            const pl = document.getElementById('p-list'); pl.innerHTML = '';
+            let p_spent = 0;
+            p_ex.forEach(i => {
+                p_spent += parseFloat(i.amt);
+                pl.innerHTML += `<div class="flex justify-between p-4 bg-white/5 border border-white/5 rounded-2xl shadow-sm"><div class="text-sm font-bold">${i.name}<br><span class="text-[9px] text-slate-500 font-medium">${i.date}</span></div><div class="text-red-400 font-black">-₹${parseFloat(i.amt).toLocaleString('en-IN')}</div></div>`;
             });
-            document.getElementById('display-remaining').innerText = (budget - spent).toLocaleString('en-IN');
+            document.getElementById('p-rem').innerText = (p_bud - p_spent).toLocaleString('en-IN');
 
-            // Lending Logic
-            const lenList = document.getElementById('lending-list');
-            lenList.innerHTML = '';
-            let totalLent = 0;
-            lending.forEach((i, idx) => {
-                totalLent += parseFloat(i.amount);
-                lenList.innerHTML += `<div class="flex justify-between items-center p-4 bg-indigo-50 rounded-2xl text-sm">
-                    <div><b class="text-indigo-900">${i.name}</b><br><small class="text-indigo-400">Lent on ${i.date}</small></div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-indigo-700">₹${i.amount}</span>
-                        <button onclick="markPaid(${idx})" class="text-[10px] bg-indigo-600 text-white px-2 py-1 rounded-md">PAID</button>
-                    </div>
-                </div>`;
+            const bl = document.getElementById('b-list'); bl.innerHTML = '';
+            let b_tot = 0;
+            b_loans.forEach((i, idx) => {
+                b_tot += parseFloat(i.amt);
+                bl.innerHTML += `<div class="flex justify-between items-center p-5 bg-white/5 border border-white/5 rounded-2xl"><div><div class="text-sm font-black text-indigo-400">${i.name}</div><div class="text-[9px] text-slate-500 uppercase font-bold">${i.date}</div></div><div class="flex items-center gap-4"><div class="text-white font-black">₹${parseFloat(i.amt).toLocaleString('en-IN')}</div><button onclick="payLoan(${idx})" class="bg-indigo-500/20 text-indigo-300 p-2 px-3 rounded-xl text-[9px] font-black uppercase">Paid</button></div></div>`;
             });
-            document.getElementById('display-lent').innerText = totalLent.toLocaleString('en-IN');
+            document.getElementById('b-total').innerText = b_tot.toLocaleString('en-IN');
 
-            localStorage.setItem('pb_v8_expenses', JSON.stringify(expenses));
-            localStorage.setItem('pb_v8_lending', JSON.stringify(lending));
+            localStorage.setItem('p_bud_v14', p_bud);
+            localStorage.setItem('p_ex_v14', JSON.stringify(p_ex));
+            localStorage.setItem('b_loans_v14', JSON.stringify(b_loans));
         }
 
-        document.getElementById('expense-form').onsubmit = (e) => {
+        function setNewBudget() {
+            const val = document.getElementById('p-set-budget').value;
+            if(val) { p_bud = parseFloat(val); p_ex = []; document.getElementById('p-set-budget').value = ''; updateUI(); }
+        }
+
+        document.getElementById('p-form').onsubmit = (e) => {
             e.preventDefault();
-            expenses.unshift({ name: document.getElementById('item-name').value, amount: document.getElementById('item-amount').value, date: new Date().toLocaleDateString('en-IN') });
+            p_ex.unshift({ name: document.getElementById('p-name').value, amt: document.getElementById('p-amt').value, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) });
             e.target.reset(); updateUI();
         };
 
-        document.getElementById('lending-form').onsubmit = (e) => {
+        document.getElementById('b-form').onsubmit = (e) => {
             e.preventDefault();
-            lending.unshift({ name: document.getElementById('borrower-name').value, amount: document.getElementById('lent-amount').value, date: new Date().toLocaleDateString('en-IN') });
+            b_loans.unshift({ name: document.getElementById('b-name').value, amt: document.getElementById('b-amt').value, date: new Date().toLocaleDateString('en-IN', {day:'2-digit', month:'short'}) });
             e.target.reset(); updateUI();
         };
 
-        function markPaid(index) {
-            lending.splice(index, 1);
-            updateUI();
-        }
-
-        function clearData() { if(confirm("Clear everything?")) { expenses = []; lending = []; budget = 0; updateUI(); } }
+        function payLoan(idx) { b_loans.splice(idx, 1); updateUI(); }
+        function fullReset() { if(confirm("System Reset? All data will be lost.")) { p_ex = []; b_loans = []; p_bud = 0; updateUI(); } }
+        
         updateUI();
     </script>
 </body>
